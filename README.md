@@ -55,8 +55,8 @@ Implemented training and evaluation workflow in `train_stress_model.py` with:
 
 On `synthetic_stress_data_3class.csv` (held-out test split):
 
-- Decision Tree Accuracy: 0.805
-- Logistic Regression Accuracy: 0.88
+- Decision Tree Accuracy: 0.765
+- Logistic Regression Accuracy: 0.86
 - Selected best model: Logistic Regression
 
 ## Repository Contents
@@ -130,6 +130,12 @@ Offline simulation mode:
 
 ```powershell
 python live_thingspeak_inference.py --simulate-csv thingspeak_data.csv
+```
+
+Presentation-ready full flow (single command):
+
+```powershell
+Write-Host 'STEP 1: Generate synthetic data'; python data_generation.py --samples 1000 --output synthetic_stress_data.csv; Write-Host 'STEP 2: Prepare 3-class labels'; python prepare_3class_dataset.py --input synthetic_stress_data.csv --output synthetic_stress_data_3class.csv; Write-Host 'STEP 3: Train non-RF model'; python train_stress_model.py --data synthetic_stress_data_3class.csv; Write-Host 'STEP 4: Run offline inference demo'; python live_thingspeak_inference.py --simulate-csv thingspeak_demo.csv --model stress_model.pkl --reference-data synthetic_stress_data_3class.csv
 ```
 
 Live ThingSpeak polling mode:

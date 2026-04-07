@@ -41,7 +41,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Train structural stress classifiers")
     parser.add_argument(
         "--data",
-        default="synthetic_stress_data.csv",
+        default="synthetic_stress_data_3class.csv",
         help="Path to CSV dataset",
     )
     args = parser.parse_args()

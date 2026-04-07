@@ -10,6 +10,20 @@ import joblib
 import pandas as pd
 
 
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    # ThingSpeak fields can occasionally be empty strings or malformed text.
+    try:
+        if value is None:
+            return default
+        if isinstance(value, str):
+            value = value.strip()
+            if value == "":
+                return default
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def http_get_json(url: str, timeout: int = 15) -> Dict[str, Any]:
     request = Request(url, method="GET")
     with urlopen(request, timeout=timeout) as response:
@@ -44,9 +58,9 @@ def write_prediction(write_api_key: str, prediction_id: int, prediction_label: s
 
 def map_thingspeak_to_features(feed: Dict[str, Any]) -> Dict[str, float]:
     return {
-        "crowd_load": float(feed.get("field1", 0.0) or 0.0),
-        "temperature": float(feed.get("field2", 0.0) or 0.0),
-        "pressure": float(feed.get("field3", 0.0) or 0.0),
+        "crowd_load": _safe_float(feed.get("field1", 0.0), 0.0),
+        "temperature": _safe_float(feed.get("field2", 0.0), 0.0),
+        "pressure": _safe_float(feed.get("field3", 0.0), 0.0),
     }
 
 
