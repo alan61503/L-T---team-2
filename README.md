@@ -27,7 +27,7 @@ The architecture diagram in `flowchat.jpeg` follows this pipeline:
 
 1. Milestone 1 - Architecture Design: Completed
 2. Milestone 2 - Dataset Generation and ML Model Development: Completed
-3. Milestone 3 - Live Data Simulation and Model Integration: In Progress
+3. Milestone 3 - Live Data Simulation and Model Integration: Completed
 4. Milestone 4 - Output Storage and Dashboard Visualisation: Pending
 5. Milestone 5 - Results and Interpretation: Pending
 
@@ -66,9 +66,12 @@ On `synthetic_stress_data_3class.csv` (held-out test split):
 - `data_generation.py`: synthetic data generation script
 - `prepare_3class_dataset.py`: 3-class label preparation script
 - `train_stress_model.py`: model training, evaluation, and export
+- `live_thingspeak_inference.py`: live ThingSpeak polling, model inference, and optional write-back
 - `synthetic_stress_data.csv`: base synthetic dataset
 - `synthetic_stress_data_3class.csv`: prepared three-class dataset
+- `thingspeak_data.csv`: sample streamed ThingSpeak records for simulation/testing
 - `stress_model.pkl`: saved best model artifact
+- `MILESTONE_3_DAILY_REPORT.md`: formal Milestone 3 daily completion report
 - `flowchat.jpeg`: architecture flow diagram
 - `Structural_Stress_Prediction.docx`: milestone-level project brief
 - `StressNet1.docx`: detailed concept document
@@ -89,4 +92,56 @@ Expected outcome:
 
 ## Current Status
 
-The repository now includes working dataset-generation and machine-learning components for Milestone 2. The model has been validated for single-record and batch inference and is ready for integration into the live data pipeline in Milestone 3.
+The repository now includes completed Milestone 2 and Milestone 3 components. The system supports live cloud data retrieval from ThingSpeak, real-time stress inference using `stress_model.pkl`, and optional prediction feedback to ThingSpeak.
+
+## Milestone 3 Completion Evidence
+
+### 1. Live Data Integration
+
+- ThingSpeak field mapping implemented:
+	- `field1 -> crowd_load`
+	- `field2 -> temperature`
+	- `field3 -> pressure`
+- Cloud retrieval from latest ThingSpeak feed is implemented in `live_thingspeak_inference.py`.
+
+### 2. Model Integration and Real-Time Inference
+
+- `stress_model.pkl` is loaded directly in the live pipeline.
+- Real-time prediction labels are generated continuously: `Normal`, `Warning`, `Critical`.
+- Missing optional features are handled with fallback defaults to preserve inference stability.
+
+### 3. Cloud Feedback Loop
+
+- Optional prediction write-back support implemented:
+	- prediction id -> `field4`
+	- prediction label -> ThingSpeak `status`
+
+### 4. Security Configuration
+
+Credentials are handled through environment variables and not hardcoded:
+
+- `THINGSPEAK_CHANNEL_ID`
+- `THINGSPEAK_READ_API_KEY`
+- `THINGSPEAK_WRITE_API_KEY`
+
+Use `.env.example` as the setup template.
+
+### 5. Run Instructions for Milestone 3
+
+Offline simulation mode:
+
+```powershell
+python live_thingspeak_inference.py --simulate-csv thingspeak_data.csv
+```
+
+Live ThingSpeak polling mode:
+
+```powershell
+python live_thingspeak_inference.py --channel-id <CHANNEL_ID> --read-api-key <READ_KEY> --iterations 10 --poll-interval 20
+```
+
+Live polling with prediction feedback to ThingSpeak:
+
+```powershell
+python live_thingspeak_inference.py --channel-id <CHANNEL_ID> --read-api-key <READ_KEY> --write-api-key <WRITE_KEY> --push-prediction --iterations 10 --poll-interval 20
+```

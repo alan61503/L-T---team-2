@@ -70,6 +70,7 @@ def main() -> None:
     print("\nUsing features:", feature_cols)
     X = df[feature_cols]
     y = df["label_encoded"]
+    feature_defaults = X.mean(numeric_only=True).to_dict()
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
@@ -123,6 +124,7 @@ def main() -> None:
             "model": best_model,
             "label_encoder": le,
             "feature_columns": feature_cols,
+            "feature_defaults": feature_defaults,
             "best_model_name": best_name,
         },
         "stress_model.pkl",
