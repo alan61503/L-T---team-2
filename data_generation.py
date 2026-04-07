@@ -1,73 +1,85 @@
-import pandas as pd
+import argparse
+
 import numpy as np
+import pandas as pd
 
-np.random.seed(42)
 
-n_samples = 1000
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Generate synthetic structural stress data")
+    parser.add_argument("--samples", type=int, default=1000, help="Number of rows to generate")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
+    parser.add_argument(
+        "--output",
+        default="synthetic_stress_data.csv",
+        help="Output CSV path",
+    )
+    args = parser.parse_args()
 
-time = pd.date_range(start="2025-01-01", periods=n_samples, freq="h")
+    if args.samples <= 0:
+        raise ValueError("--samples must be a positive integer")
 
-# Simulate multiple locations (e.g., tourist bridges)
-locations = [
-    {"name": "Bridge_A", "lat": 13.0827, "lon": 80.2707, "elev": 6},   # Chennai
-    {"name": "Bridge_B", "lat": 12.9716, "lon": 77.5946, "elev": 920}, # Bangalore
-    {"name": "Bridge_C", "lat": 11.0168, "lon": 76.9558, "elev": 411}, # Coimbatore
-]
+    rng = np.random.default_rng(args.seed)
+    n_samples = args.samples
 
-# Randomly assign locations
-loc_choices = np.random.choice(len(locations), n_samples)
+    timestamps = pd.date_range(start="2025-01-01", periods=n_samples, freq="h")
 
-latitude = [locations[i]["lat"] + np.random.normal(0, 0.001) for i in loc_choices]
-longitude = [locations[i]["lon"] + np.random.normal(0, 0.001) for i in loc_choices]
-elevation = np.array([locations[i]["elev"] + np.random.normal(0, 5) for i in loc_choices])
-location_name = [locations[i]["name"] for i in loc_choices]
+    # Simulate multiple locations (e.g., tourist bridges)
+    locations = [
+        {"name": "Bridge_A", "lat": 13.0827, "lon": 80.2707, "elev": 6},
+        {"name": "Bridge_B", "lat": 12.9716, "lon": 77.5946, "elev": 920},
+        {"name": "Bridge_C", "lat": 11.0168, "lon": 76.9558, "elev": 411},
+    ]
 
-# Sensor data
-crowd_load = np.random.randint(0, 500, n_samples)
-temperature = np.random.uniform(15, 45, n_samples)
+    loc_names = np.array([loc["name"] for loc in locations], dtype=object)
+    loc_lats = np.array([loc["lat"] for loc in locations], dtype=float)
+    loc_lons = np.array([loc["lon"] for loc in locations], dtype=float)
+    loc_elevs = np.array([loc["elev"] for loc in locations], dtype=float)
 
-# Pressure slightly depends on elevation (higher → lower pressure)
-pressure = 1013 - (elevation * 0.12) + np.random.normal(0, 5, n_samples)
+    loc_choices = rng.integers(0, len(locations), size=n_samples)
 
-vibration = np.random.uniform(0, 5, n_samples)
+    latitude = loc_lats[loc_choices] + rng.normal(0, 0.001, n_samples)
+    longitude = loc_lons[loc_choices] + rng.normal(0, 0.001, n_samples)
+    elevation = loc_elevs[loc_choices] + rng.normal(0, 5, n_samples)
+    location_name = loc_names[loc_choices]
 
-# Stress formula
-stress = (
-    0.5 * crowd_load +
-    0.3 * temperature +
-    0.2 * pressure +
-    10 * vibration +
-    0.1 * elevation +
-    np.random.normal(0, 20, n_samples)
-)
-status = []
+    crowd_load = rng.integers(0, 500, n_samples)
+    temperature = rng.uniform(15, 45, n_samples)
+    vibration = rng.uniform(0, 5, n_samples)
 
-for s, vib in zip(stress, vibration):
-    if s < 350 and vib < 2:
-        status.append("Normal")
-    elif s < 650:
-        status.append("Warning")
-    else:
-        status.append("Critical")
+    # Pressure slightly depends on elevation (higher altitude -> lower pressure)
+    pressure = 1013 - (elevation * 0.12) + rng.normal(0, 5, n_samples)
 
-# DataFrame
-df = pd.DataFrame({
-    "timestamp": time,
-    "location": location_name,
-    "latitude": latitude,
-    "longitude": longitude,
-    "elevation": elevation,
-    "crowd_load": crowd_load,
-    "temperature": temperature,
-    "pressure": pressure,
-    "vibration": vibration,
-    "stress": stress,
-    "status": status
-})
+    stress = (
+        0.5 * crowd_load
+        + 0.3 * temperature
+        + 0.2 * pressure
+        + 10 * vibration
+        + 0.1 * elevation
+        + rng.normal(0, 20, n_samples)
+    )
 
-# Save file
-df.to_csv("synthetic_stress_data.csv", index=False)
+    # Vectorized class labeling is faster and simpler than row-wise loops.
+    status = np.where((stress < 350) & (vibration < 2), "Normal", np.where(stress < 650, "Warning", "Critical"))
 
-# Download (for Colab)
-from google.colab import files
-files.download("synthetic_stress_data.csv")
+    df = pd.DataFrame(
+        {
+            "timestamp": timestamps,
+            "location": location_name,
+            "latitude": latitude,
+            "longitude": longitude,
+            "elevation": elevation,
+            "crowd_load": crowd_load,
+            "temperature": temperature,
+            "pressure": pressure,
+            "vibration": vibration,
+            "stress": stress,
+            "status": status,
+        }
+    )
+
+    df.to_csv(args.output, index=False)
+    print(f"Saved {len(df)} rows to {args.output}")
+
+
+if __name__ == "__main__":
+    main()

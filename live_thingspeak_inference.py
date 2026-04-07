@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 import time
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Dict, Iterable
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 

@@ -46,7 +46,6 @@ Implemented training and evaluation workflow in `train_stress_model.py` with:
 - train/test split,
 - label encoding,
 - multi-model comparison:
-	- Random Forest
 	- Decision Tree
 	- Logistic Regression
 - automatic best-model selection,
@@ -56,7 +55,6 @@ Implemented training and evaluation workflow in `train_stress_model.py` with:
 
 On `synthetic_stress_data_3class.csv` (held-out test split):
 
-- Random Forest Accuracy: 0.85
 - Decision Tree Accuracy: 0.805
 - Logistic Regression Accuracy: 0.88
 - Selected best model: Logistic Regression

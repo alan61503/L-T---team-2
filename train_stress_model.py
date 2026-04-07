@@ -1,7 +1,6 @@
 import pandas as pd
 import argparse
 
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
@@ -76,15 +75,6 @@ def main() -> None:
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    rf = RandomForestClassifier(
-        n_estimators=600,
-        class_weight="balanced_subsample",
-        random_state=42,
-        n_jobs=-1,
-    )
-    rf.fit(X_train, y_train)
-    y_pred_rf = rf.predict(X_test)
-
     dt = DecisionTreeClassifier(class_weight="balanced", random_state=42)
     dt.fit(X_train, y_train)
     y_pred_dt = dt.predict(X_test)
@@ -98,12 +88,10 @@ def main() -> None:
     lr.fit(X_train, y_train)
     y_pred_lr = lr.predict(X_test)
 
-    acc_rf = accuracy_score(y_test, y_pred_rf)
     acc_dt = accuracy_score(y_test, y_pred_dt)
     acc_lr = accuracy_score(y_test, y_pred_lr)
 
     candidates = {
-        "Random Forest": (rf, y_pred_rf, acc_rf),
         "Decision Tree": (dt, y_pred_dt, acc_dt),
         "Logistic Regression": (lr, y_pred_lr, acc_lr),
     }
@@ -112,7 +100,6 @@ def main() -> None:
     )
 
     print("\nAccuracy:")
-    print("Random Forest Accuracy:", acc_rf)
     print("Decision Tree Accuracy:", acc_dt)
     print("Logistic Regression Accuracy:", acc_lr)
 

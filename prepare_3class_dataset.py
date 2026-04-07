@@ -1,4 +1,5 @@
 import argparse
+import numpy as np
 import pandas as pd
 
 
@@ -17,6 +18,9 @@ def main() -> None:
     if "stress" not in df.columns:
         raise ValueError("Input dataset must contain a 'stress' column")
 
+    if df["stress"].isna().any():
+        raise ValueError("Input dataset contains missing values in 'stress'")
+
     # Ensure all three classes exist for viva/demo purposes.
     conditions = [
         df["stress"] < 300,
@@ -24,10 +28,7 @@ def main() -> None:
         df["stress"] >= 450,
     ]
     labels = ["Normal", "Warning", "Critical"]
-    df["label"] = pd.Series(pd.NA, index=df.index)
-    df.loc[conditions[0], "label"] = labels[0]
-    df.loc[conditions[1], "label"] = labels[1]
-    df.loc[conditions[2], "label"] = labels[2]
+    df["label"] = np.select(conditions, labels, default="Warning")
 
     df.to_csv(args.output, index=False)
 
