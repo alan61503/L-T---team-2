@@ -1,84 +1,92 @@
 # StressNet: Structural Stress Prediction
 
-StressNet is an IoT + AI concept project for monitoring structural stress in tourist bridges, skywalks, and viewing platforms. It combines live sensor streams, cloud processing, machine learning inference, and dashboard visualization to classify safety risk levels in near real time.
+StressNet is an IoT + AI project for monitoring structural stress in tourist bridges, skywalks, and viewing platforms. The system combines sensor data, cloud ingestion, machine learning inference, and dashboard visualisation to classify risk levels in near real time.
 
-## Project Goal
+## Project Objective
 
-Build a monitoring workflow that can:
+Develop an end-to-end workflow that can:
 
-- collect force, temperature, and pressure data from sensors,
-- process and store data in the cloud,
-- predict stress state using an ML model,
-- present live status and alerts for safety operators.
-
-## Problem Statement
-
-Traditional structural monitoring often relies on manual checks and fixed load assumptions. That approach can miss sudden overload or changing environmental conditions. StressNet targets proactive safety by continuously estimating structural stress and highlighting risk trends.
+- collect force/load, temperature, and pressure data,
+- preprocess and store observations,
+- classify structural stress as Normal, Warning, or Critical,
+- support safety monitoring and alerting.
 
 ## System Architecture
 
-The current architecture (see `flowchat.jpeg`) follows this pipeline:
+The architecture diagram in `flowchat.jpeg` follows this pipeline:
 
-1. Sensor Layer: force, temperature, pressure sensors
-2. Edge Layer: ESP32 microcontroller collects and forwards readings
-3. Ingestion Layer: WiFi/MQTT upload to ThingSpeak cloud
-4. Cloud Processing: Azure services and data processing components
-5. AI/ML Layer: stress prediction model outputs risk class
-6. Visualization Layer: backend API and Power BI dashboard
-7. Alerting Layer: visual indicators and email/SMS notifications
+1. Sensor Layer: force/load, temperature, pressure sensors
+2. Edge Layer: ESP32 microcontroller collection and forwarding
+3. Ingestion Layer: WiFi/MQTT to ThingSpeak
+4. Cloud Processing Layer: Azure-based processing components
+5. AI/ML Layer: stress classification inference
+6. Visualisation Layer: backend API and Power BI dashboard
+7. Alerting Layer: visual and message-based notifications
 
-## Stress Classification
+## Milestone Status
 
-Planned prediction classes:
+1. Milestone 1 - Architecture Design: Completed
+2. Milestone 2 - Dataset Generation and ML Model Development: Completed
+3. Milestone 3 - Live Data Simulation and Model Integration: In Progress
+4. Milestone 4 - Output Storage and Dashboard Visualisation: Pending
+5. Milestone 5 - Results and Interpretation: Pending
 
-- Safe (low stress)
-- Warning (moderate stress)
-- Danger/Critical (high stress)
+## Milestone 2 Completion Evidence
 
-## Hardware Components
+### 1. Synthetic Dataset Generation and Preprocessing
 
-Mentioned hardware stack:
+- Synthetic historical dataset generated: `synthetic_stress_data.csv`
+- Three-class labelled dataset prepared: `synthetic_stress_data_3class.csv`
+- Label classes used: `Normal`, `Warning`, `Critical`
 
-- ESP32-S3 microcontroller
-- DHT22 temperature sensor
-- BMP180 pressure sensor
-- HX711 load cell amplifier
-- 5 kg load cell (force sensor)
-- LED status indicator
+### 2. ML Model Training and Validation
 
-## Software and Cloud Stack
+Implemented training and evaluation workflow in `train_stress_model.py` with:
 
-- Circuit simulation/design: Cirkit Designer
-- Sensor ingestion: ThingSpeak
-- Cloud services and processing: Microsoft Azure
-- Model training notebooks/workflows: Google Colab
-- Dashboard and analytics: Microsoft Power BI
+- train/test split,
+- label encoding,
+- multi-model comparison:
+	- Random Forest
+	- Decision Tree
+	- Logistic Regression
+- automatic best-model selection,
+- model serialisation to `stress_model.pkl`.
 
-## Planned Milestones
+### 3. Latest Validated Performance
 
-1. Architecture design and end-to-end data flow definition
-2. Dataset generation and ML model training/validation
-3. Live data simulation and model integration
-4. Output storage and dashboard visualization
-5. Result analysis and industry interpretation
+On `synthetic_stress_data_3class.csv` (held-out test split):
+
+- Random Forest Accuracy: 0.85
+- Decision Tree Accuracy: 0.805
+- Logistic Regression Accuracy: 0.88
+- Selected best model: Logistic Regression
 
 ## Repository Contents
 
-This repository currently contains documentation and architecture artifacts:
+- `data_generation.py`: synthetic data generation script
+- `prepare_3class_dataset.py`: 3-class label preparation script
+- `train_stress_model.py`: model training, evaluation, and export
+- `synthetic_stress_data.csv`: base synthetic dataset
+- `synthetic_stress_data_3class.csv`: prepared three-class dataset
+- `stress_model.pkl`: saved best model artifact
+- `flowchat.jpeg`: architecture flow diagram
+- `Structural_Stress_Prediction.docx`: milestone-level project brief
+- `StressNet1.docx`: detailed concept document
 
-- `Structural_Stress_Prediction.docx`: project brief and milestone-level deliverables
-- `StressNet1.docx`: detailed concept document with components, flow, and expected outcomes
-- `flowchat.jpeg`: visual architecture flow diagram
-- `README.md`: this summary
+## How to Reproduce Milestone 2
+
+Run from the project root:
+
+```powershell
+python prepare_3class_dataset.py
+python train_stress_model.py --data synthetic_stress_data_3class.csv
+```
+
+Expected outcome:
+
+- model performance metrics printed to terminal,
+- best model exported as `stress_model.pkl`.
 
 ## Current Status
 
-At the moment, the repository appears to be in a documentation/planning phase. Source code for firmware, backend services, data pipeline, and ML model training/deployment is not yet present in this branch.
-
-## Suggested Next Build Steps
-
-1. Add firmware code for ESP32 sensor acquisition and cloud publishing.
-2. Add a cloud function/service for preprocessing and inference.
-3. Add ML training scripts/notebooks and versioned model artifacts.
-4. Add dashboard dataset/schema definitions and alert rules.
-5. Add deployment/configuration docs for reproducible setup.
+The repository now includes working dataset-generation and machine-learning components for Milestone 2. The model has been validated for single-record and batch inference and is ready for integration into the live data pipeline in Milestone 3.
