@@ -2,7 +2,12 @@ import pandas as pd
 import argparse
 
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -43,6 +48,11 @@ def main() -> None:
         "--data",
         default="synthetic_stress_data_3class.csv",
         help="Path to CSV dataset",
+    )
+    parser.add_argument(
+        "--confusion-matrix-output",
+        default="confusion_matrix.png",
+        help="Path to save confusion matrix image (PNG)",
     )
     args = parser.parse_args()
 
@@ -105,6 +115,29 @@ def main() -> None:
 
     print(f"\nBest Model: {best_name} ({best_acc:.3f})")
     print("\nBest Model Report:\n", classification_report(y_test, best_pred))
+
+    cm = confusion_matrix(y_test, best_pred)
+    cm_df = pd.DataFrame(
+        cm,
+        index=[f"true_{cls}" for cls in le.classes_],
+        columns=[f"pred_{cls}" for cls in le.classes_],
+    )
+    print("Confusion Matrix:")
+    print(cm_df)
+
+    try:
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(figsize=(7, 5))
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=le.classes_)
+        disp.plot(ax=ax, cmap="Blues", colorbar=False, values_format="d")
+        ax.set_title(f"Confusion Matrix ({best_name})")
+        fig.tight_layout()
+        fig.savefig(args.confusion_matrix_output, dpi=160)
+        plt.close(fig)
+        print(f"Saved confusion matrix image to {args.confusion_matrix_output}")
+    except Exception as exc:
+        print(f"Could not save confusion matrix image: {exc}")
 
     joblib.dump(
         {
