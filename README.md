@@ -28,7 +28,7 @@ The architecture diagram in `flowchat.jpeg` follows this pipeline:
 1. Milestone 1 - Architecture Design: Completed
 2. Milestone 2 - Dataset Generation and ML Model Development: Completed
 3. Milestone 3 - Live Data Simulation and Model Integration: Completed
-4. Milestone 4 - Output Storage and Dashboard Visualisation: Pending
+4. Milestone 4 - Output Storage and Dashboard Visualisation: Completed
 5. Milestone 5 - Results and Interpretation: Pending
 
 ## Milestone 2 Completion Evidence
@@ -92,6 +92,8 @@ Expected outcome:
 
 The repository now includes completed Milestone 2 and Milestone 3 components. The system supports live cloud data retrieval from ThingSpeak, real-time stress inference using `stress_model.pkl`, and optional prediction feedback to ThingSpeak.
 
+For a full Milestone 3 + 4 workflow, see `MILESTONE_3_4_END_TO_END_RUNBOOK.md`.
+
 ## Milestone 3 Completion Evidence
 
 ### 1. Live Data Integration
@@ -149,3 +151,119 @@ Live polling with prediction feedback to ThingSpeak:
 ```powershell
 python live_thingspeak_inference.py --channel-id <CHANNEL_ID> --read-api-key <READ_KEY> --write-api-key <WRITE_KEY> --push-prediction --iterations 10 --poll-interval 20
 ```
+
+Real-time sensor simulation upload to ThingSpeak cloud:
+
+```powershell
+python simulate_sensor_to_thingspeak.py --source-csv thingspeak_demo.csv --poll-interval 10 --iterations 0
+```
+
+## Milestone 4 Completion Evidence
+
+### 1. Structured Analytics Output
+
+`live_thingspeak_inference.py` now writes dashboard-ready outputs:
+
+- `analytics_output/live_stress_events.csv` (append-only event log)
+- `analytics_output/current_status.csv` (latest snapshot)
+
+Both files include:
+
+- sensor values (`crowd_load`, `temperature`, `pressure`),
+- model prediction (`prediction_id`, `prediction_label`),
+- security-facing indicators (`load_level`, `occupancy_status`, `risk_score`, `risk_alert`).
+
+### 2. Dashboard Visualisation (Power BI)
+
+Power BI can directly ingest these CSV outputs for:
+
+- current occupancy status,
+- current load level,
+- risk alerts for security personnel,
+- trend charts across recent events.
+
+See `MILESTONE_4_POWER_BI_DASHBOARD.md` for full setup.
+
+### 3. Run Instructions for Milestone 4
+
+Generate analytics output in offline mode:
+
+```powershell
+python live_thingspeak_inference.py --simulate-csv thingspeak_demo.csv --model stress_model.pkl --reference-data synthetic_stress_data_3class.csv
+```
+
+Generate analytics output in live polling mode:
+
+```powershell
+python live_thingspeak_inference.py --channel-id <CHANNEL_ID> --read-api-key <READ_KEY> --iterations 50 --poll-interval 20
+```
+
+Generate true live dashboard feed for Power BI push dataset:
+
+```powershell
+python live_thingspeak_inference.py --channel-id <CHANNEL_ID> --read-api-key <READ_KEY> --iterations 500 --poll-interval 10 --powerbi-push-url <POWERBI_PUSH_URL>
+```
+
+## No-License Real-Time Dashboard (Streamlit)
+
+If Power BI Service sign-in/license is not available, use the built-in Streamlit dashboard.
+
+### Files
+
+- `live_dashboard_streamlit.py` (dashboard app)
+- `requirements_dashboard.txt` (dashboard dependencies)
+
+### Local real-time run
+
+Terminal 1 (continuous inference + CSV updates):
+
+```powershell
+python live_thingspeak_inference.py --iterations 0 --poll-interval 10
+```
+
+Terminal 2 (dashboard):
+
+```powershell
+pip install -r requirements_dashboard.txt
+streamlit run live_dashboard_streamlit.py
+```
+
+This dashboard auto-refreshes every few seconds and shows:
+
+- current occupancy status,
+- current load level,
+- risk score + active alert,
+- risk and crowd-load trends,
+- recent event table.
+
+### Cloud deployment options
+
+You can deploy `live_dashboard_streamlit.py` to any platform that supports Python web apps (for example Azure App Service, Render, Railway, or Streamlit Community Cloud), then keep `live_thingspeak_inference.py` running on an always-on host (VM/container) that writes to shared storage or pushes to an API.
+
+## Cloud Real-Time Dashboard (Single Service)
+
+For a fully cloud-hosted real-time dashboard without Power BI licensing, use:
+
+- `cloud_live_dashboard.py` (fetches data, runs inference, stores event history, renders dashboard)
+- `render.yaml` (Render deployment config)
+
+### Deploy on Render
+
+1. Push this repository to GitHub.
+2. In Render, create a new Web Service from your repo.
+3. Render will detect `render.yaml` automatically.
+4. Deploy.
+
+After deployment, open the public URL and the dashboard will auto-refresh every few seconds.
+
+### Modes
+
+- Simulation mode (default in `render.yaml`): uses `thingspeak_demo.csv` to generate continuous demo events.
+- Live ThingSpeak mode: set env var `USE_SIMULATION=false` and configure:
+	- `THINGSPEAK_CHANNEL_ID`
+	- `THINGSPEAK_READ_API_KEY`
+
+### Notes
+
+- Event history is stored in local SQLite (`cloud_events.db`) inside the service instance.
+- Free cloud plans can sleep when idle; for true 24/7 uptime use a non-sleeping paid tier.

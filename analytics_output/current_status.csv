@@ -1,0 +1,2 @@
+event_time_utc,channel_id,source_created_at,source_entry_id,crowd_load,temperature,pressure,prediction_id,prediction_label,load_level,occupancy_status,risk_score,risk_alert,write_back_enabled,write_back_response
+2026-04-08T04:38:18.289367+00:00,simulation,2025-01-01 19:00:00,20,153.0,36.87813731581168,905.3234599281544,2,Warning,Low,LIMITED,0.6,Caution: control inflow and increase monitoring,False,
