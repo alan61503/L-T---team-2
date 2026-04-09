@@ -9,15 +9,42 @@
 StressNet is designed as a continuous edge-to-cloud structural intelligence platform. By embedding hardware directly onto infrastructure (tourist bridges, glass sky-walks), the system monitors real-time physical strain and environmental inhibitors. 
 
 ### Data Flow Diagram
-1. **Edge Acquisition:** An ESP32 microcontroller serves as the edge node, wired to an HX711 Load Cell (Force/Weight), a DHT22 (Ambient Temperature), and an Adafruit BMP085 (Barometric Pressure).
+1. **Edge Acquisition:** An ESP32 microcontroller serves as the edge node, wired to an HX711 Load Cell (Force/Weight), a DHT22 (Ambient Temperature), and an Adafruit BMP180 (Barometric Pressure).
 2. **Cloud Transmission:** The ESP32 formats the telemetry load and natively streams it over Wi-Fi to a cloud-hosted REST API endpoint (ThingSpeak) every 15 seconds.
 3. **Inference Engine (AI Pipeline):** A hosted Python backend (`smartbridge_real_time_prediction.py`) queries the ThingSpeak JSON payload, validates the variables, and runs the live data through our exported Multi-Factor classification algorithm.
 4. **Safety Dashboard:** The classified outcomes (Normal, Warning, Critical) and time-series sensor data are streamed into Microsoft Power BI, which automatically updates gauge indicators and security alerts for personnel.
 
-### What I Did:
+### System Architecture & Data Flowchart
+
+```mermaid
+graph TD
+    subgraph Edge Layer
+        A[ESP32 Microcontroller]
+        L[HX711 Load Cell] -->|Force/Weight| A
+        T[DHT22] -->|Temperature| A
+        P[BMP180] -->|Pressure| A
+    end
+
+    subgraph Cloud Layer
+        A -->|Wi-Fi / HTTP GET| B[ThingSpeak REST API]
+    end
+
+    subgraph Intelligence Hub
+        B -->|Fetch JSON| C[Python Real-Time Engine]
+        C -->|Live Logic Processing| D[Classification Engine]
+        D -->|Prediction: Normal/Warning/Critical| E[(Local CSV Ledger)]
+    end
+
+    subgraph Visualization
+        E -->|Time-Series Sync| F[Power BI Dashboard]
+        F -->|Proactive Alerts| G[Security Personnel]
+    end
+```
+
+### What We Did:
 * Designed the core architecture linking physical hardware to cloud analytics.
-* Wired and programmed the ESP32 microcontroller with the HX711, DHT22, and BMP085 sensors.
-* Configured the ThingSpeak API endpoints to accept my scheduled telemetry streams over Wi-Fi.
+* Wired and programmed the ESP32 microcontroller with the HX711, DHT22, and BMP180 sensors.
+* Configured the ThingSpeak API endpoints to accept our scheduled telemetry streams over Wi-Fi.
 
 ---
 
@@ -31,15 +58,19 @@ To train the system effectively prior to physical deployment, a synthetic histor
 
 ### Model Logic & Training
 A rigorous multi-factor rule-based algorithm was constructed to prioritize bridge safety under changing weather:
-*   **Normal:** Load ≤ 2 kg AND Temperature < 35°C AND Pressure between 980-1020 hPa.
-*   **Warning:** Activated when loads reach medium saturation (2–4 kg), or if environments become hostile (Heat > 35°C or Storm < 970 hPa), triggering early downgrades of safety tiers.
-*   **Critical:** Strict override for heavy burdens (> 4kg) or compounded dangers (Medium Load + Heat + Violent Pressure dropping).
+
+| Safety Status | Load (kg) | Temperature (°C) | Pressure (hPa) | Activation Logic |
+| :--- | :--- | :--- | :--- | :--- |
+| **Normal** | ≤ 2.0 kg | < 35°C | 980 – 1020 hPa | Requires strict adherence across all environmental bounds. |
+| **Warning** | 2.0 – 4.0 kg | > 35°C | < 970 or > 1020 hPa | Triggers on medium saturation or isolates independent environmental hazards. |
+| **Critical** | > 4.0 kg | > 36°C | < 970 or > 1025 hPa | Absolute override for high burdens, or compounds medium loads with severe weather. |
+
 The dataset was processed through this logic, labeled accordingly, and prepared for scalable pipeline evaluation. 
 
-### What I Did:
+### What We Did:
 * Built a Python script to algorithmically synthesize 1,000 realistic historical test records.
 * Engineered a strict, multi-factor classification algorithm perfectly handling Load, Temperature, and Pressure edge-cases.
-* Trained and exported an XGBoost AI model to be the brains behind the live prediction engine.
+* Trained and exported an AI Classification model to act as the brains behind our live prediction engine.
 
 ---
 
@@ -50,13 +81,13 @@ The physical hardware (`smartbridge_esp32.ino`) simulates a real-time localized 
 
 ### Real-Time Pipeline Integration
 The locally hosted `smartbridge_real_time_prediction.py` script actively polls the exact ThingSpeak Channel. 
-*   **Data Transformation:** It converts the raw Pascals natively output by the BMP085 into hectopascals (hPa) to guarantee compliance with the physics-based logic engine.
+*   **Data Transformation:** It converts the raw Pascals natively output by the BMP180 into hectopascals (hPa) to guarantee compliance with the physics-based logic engine.
 *   **Live Prediction:** Transformed values are routed into the rules-engine, immediately categorizing the live hardware variables into a real-time risk assessment without disrupting the active cloud pipeline.
 
-### What I Did:
+### What We Did:
 * Finalized the ESP32 firmware, calculating the exact scaling factors for physical desktop-load testing.
 * Built the `smartbridge_real_time_prediction.py` backend pipeline to listen for cloud updates.
-* Engineered real-time data normalization (e.g., automatically safely converting raw Pascals to hPa) to guarantee my AI model receives strictly aligned data.
+* Engineered real-time data normalization (e.g., automatically safely converting raw Pascals to hPa) to guarantee our AI model receives strictly aligned data.
 
 ---
 
@@ -71,7 +102,10 @@ A dynamic **Microsoft Power BI Dashboard** was implemented specifically for loca
 *   **Current Occupancy & Alerting:** Cards clearly display real-time weight on the platform, and a gauge strictly limits safe thresholds. 
 *   **Conditional Formatting:** The current structural diagnosis updates dynamically. Visuals remain green when load is strictly handled, but rapidly flash to red during "Critical" events.
 
-### What I Did:
+![Power BI Configuration pane](./Powerbi.png)
+*(Power BI Format Visual interface utilized for configuring conditional alert thresholds and data axes)*
+
+### What We Did:
 * Configured Python logic to continuously append predictive targets and properly formatted local timestamps directly to a dynamic `.csv` ledger.
 * Imported these data clusters into Microsoft Power BI to design a custom security dashboard.
 * Programmed the visual UI with strict conditional formatting laws (Green/Yellow/Red alerts) for at-a-glance threat detection.
@@ -88,7 +122,7 @@ Tourist infrastructure is plagued by asymmetrical flash-crowds where users bunch
 *   **Dynamic Access:** It is inherently designed to integrate with automated entrance control. If a Warning triggers, entry gates temporarily suspend admittance until the crowd naturally advances across the bridge.
 *   **Incident Prevention:** By mathematically proving that high heat or dropping storm-pressure drastically lowers the standard load threshold, StressNet automatically restricts tourists earlier on hostile/weather-heavy days, actively prioritizing human life against invisible forces like material expansion.
 
-### What I Did:
+### What We Did:
 * Authored the strategic response protocols redefining how infrastructure handles structural maintenance.
-* Validated the system’s ability to recognize "invisible" material threats based strictly on my multi-factor logic.
+* Validated the system’s ability to recognize "invisible" material threats based strictly on our multi-factor logic.
 * Translated raw machine learning data directly into actionable safety recommendations, completing the bridge from code to a life-saving physical utility.
