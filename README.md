@@ -49,8 +49,8 @@ The Python script operates as an invisible bridge between ThingSpeak and Blynk, 
    * **V3 (Load):** Double (Min 0, Max 10)
    * **V4 (Stress Status):** String (No min/max required)
 3. Set up two **Events** in your Template to trigger when the Python script outputs severe threat codes:
-   * Event Code `warning_alert` (Warning type) -> Enable Push/Email
-   * Event Code `critical_alert` (Critical type) -> Enable Push/Email
+   * Event Code `warning_alert` (Warning type) -> Enable Push Notifications
+   * Event Code `critical_alert` (Critical type) -> Enable Push Notifications /Email
 
 **Mobile Phone Setup:**
 1. Open the Blynk IoT App and add your device.
