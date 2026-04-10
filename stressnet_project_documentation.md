@@ -61,9 +61,9 @@ A rigorous multi-factor rule-based algorithm was constructed to prioritize bridg
 
 | Safety Status | Load (kg) | Temperature (°C) | Pressure (hPa) | Activation Logic |
 | :--- | :--- | :--- | :--- | :--- |
-| **Normal** | ≤ 2.0 kg | < 35°C | 980 – 1020 hPa | Requires strict adherence across all environmental bounds. |
-| **Warning** | 2.0 – 4.0 kg | > 35°C | < 970 or > 1020 hPa | Triggers on medium saturation or isolates independent environmental hazards. |
-| **Critical** | > 4.0 kg | > 36°C | < 970 or > 1025 hPa | Absolute override for high burdens, or compounds medium loads with severe weather. |
+| **Normal** | ≤ 2.0 kg | <= 35°C | 980 – 1020 hPa | Requires strict adherence across all environmental bounds. |
+| **Warning** | 2.0 – 4.0 kg | > 35°C and <= 40°C | < 970 or > 1020 hPa | Triggers on medium saturation or isolates independent environmental hazards. |
+| **Critical** | > 4.0 kg | > 40°C | < 970 or > 1025 hPa | Absolute override for high burdens, or compounds medium loads with severe weather. |
 
 The dataset was processed through this logic, labeled accordingly, and prepared for scalable pipeline evaluation. 
 
