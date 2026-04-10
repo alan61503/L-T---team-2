@@ -47,7 +47,7 @@ The Python script operates as an invisible bridge between ThingSpeak and Blynk, 
    * **V1 (Temperature):** Double (Min 0, Max 100)
    * **V2 (Pressure):** Double (Min 600, Max 1100)
    * **V3 (Load):** Double (Min 0, Max 10)
-   * **V4 (AI Prediction):** String (No min/max required)
+   * **V4 (Stress Status):** String (No min/max required)
 3. Set up two **Events** in your Template to trigger when the Python script outputs severe threat codes:
    * Event Code `warning_alert` (Warning type) -> Enable Push/Email
    * Event Code `critical_alert` (Critical type) -> Enable Push/Email
