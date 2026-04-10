@@ -111,7 +111,7 @@ A dynamic **Microsoft Power BI Dashboard** was implemented specifically for loca
 ![Power BI Configuration pane](./Powerbi.png)
 *(Power BI Format Visual interface utilized for configuring conditional alert thresholds and data axes)*
 
-![Blynk Mobile Dashboard](./blynk.jpg)
+![Blynk Mobile Dashboard](./phone.jpg)
 *(Blynk mobile interface showing real-time load, temperature, pressure and alert notifications)*
 
 ### What We Did:
