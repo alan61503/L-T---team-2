@@ -40,8 +40,7 @@ graph TD
     subgraph Visualization
         E -->|Time-Series Sync| F[Power BI Dashboard]
         C -->|REST /batch/update| H[Blynk Mobile App]
-        H -->|Proactive Alerts| G[Security Personnel]
-        F -->|Proactive Alerts| G
+      
     end
 ```
 
