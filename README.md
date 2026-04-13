@@ -83,4 +83,4 @@ On your Table or Stress Level card backgrounds (Format Visual > Background > Con
 This structural health monitoring apparatus brings "invisible" structural fatigue into obvious view:
 * **Crowd Safety:** Continuous active monitoring prevents catastrophic structural failure caused by flash crowds or tourist events exceeding standard pedestrian density parameters.
 * **Rapid Alerting System:** Through the integration of the Blynk REST API, site managers receive instant lock-screen notifications the exact second the Python ML engine calculates a critical failure limit.
-* **Invisible Threat Mitigation:** Correlating extreme weather data with raw gravity loads alerts operators to severe freeze-fracturing or thermal expansion weaknesses. Proactive decision-making shifts maintenance from a "reactive repair" stance to an exact science.
+* **Invisible Threat Mitigation:** Correlating extreme weather data with raw gravity loads alerts operators to severe freeze-fracturing or thermal expansion weaknesses. This shifts proactive decision making to reactive data driven science.
